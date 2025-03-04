@@ -1671,7 +1671,22 @@ Int ChinookAIUpdate::getUpgradedSupplyBoost() const
 	static const UpgradeTemplate *supplyLinesTemplate = TheUpgradeCenter->findUpgrade( "Upgrade_AmericaSupplyLines" );
 		
 	if (player && supplyLinesTemplate && player->hasUpgradeComplete(supplyLinesTemplate))
-		return getChinookAIUpdateModuleData()->m_upgradedSupplyBoost;
+	/*
+		//DO NOT MERGE. NEEDS INPUT
+
+		// approach 1
+		//  =================== Community Fix Start =================
+		/** Fixes supplyboost giving the full amounts on partial loads */
+		if((getChinookAIUpdateModuleData()->m_numberBoxes == 0) || (getChinookAIUpdateModuleData()->m_maxBoxesData == 0)) //we have no maidens, nor can we hold maidens
+			return 0;
+		return (Round_Down((getChinookAIUpdateModuleData()->m_upgradedSupplyBoost) * (getChinookAIUpdateModuleData()->m_numberBoxes / getChinookAIUpdateModuleData()->m_maxBoxesData))); //SupplyBoost dollar amount * percent of how full we are.
+		//  ==================== Community Fix End ==================		
+
+		// approach 2
+		//  =================== Community Fix Start =================
+		/** Fixes supplyboost not multipying based on the number of crates */
+		return (getChinookAIUpdateModuleData()->m_upgradedSupplyBoost * getChinookAIUpdateModuleData()->m_numberBoxes); //each collected crate multiplies the supplyboost dollar amount. 
+		//  ==================== Community Fix End ==================					//the ini file for "UpgradedSupplyBoost" is a little ambigious, but this sounds like it was the original intent.
 	else
 		return 0;
 }
